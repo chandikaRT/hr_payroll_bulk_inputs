@@ -9,10 +9,11 @@ class ImportExcelWizard(models.TransientModel):
     _name = 'hr.payslip.input.import.wizard'
     _description = 'Import Payslip Inputs from Excel'
 
-    bulk_input_id = fields.Many2one(
-        'hr.payslip.bulk.input',
-        string='Bulk Input Record',
-        required=True
+    date = fields.Date(
+        string='Target Month',
+        required=True,
+        default=fields.Date.today(),
+        help="Select the month/year for these inputs (day will be set to 1st)"
     )
     excel_file = fields.Binary(
         string='Excel File',
@@ -33,56 +34,109 @@ class ImportExcelWizard(models.TransientModel):
             sheet = wb.active
             
             # Get header row to find columns
-            headers = {cell.value: idx for idx, cell in enumerate(sheet[1], start=1)}
+            headers = {}
+            for idx, cell in enumerate(sheet[1], start=1):
+                if cell.value:
+                    headers[cell.value.strip()] = idx
             
-            required_columns = ['Employee', 'Amount']
+            required_columns = ['Employee', 'Input Type', 'Amount']
             for col in required_columns:
                 if col not in headers:
                     raise UserError(_(f"Missing required column: '{col}'"))
             
-            # Process rows
-            successful = 0
-            errors = []
+            # Normalize date to first day of month
+            target_date = self.date.replace(day=1)
+            
+            # Process rows and group by input type
             Employee = self.env['hr.employee']
+            InputType = self.env['hr.payslip.input.type']
+            BulkInput = self.env['hr.payslip.bulk.input']
             InputLine = self.env['hr.payslip.input.line']
             
-            # Clear existing lines for this bulk input
-            self.bulk_input_id.line_ids.unlink()
+            # Dictionary to hold lines grouped by input type
+            input_type_data = {}
+            errors = []
             
             for row_idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
                 try:
-                    employee_name = row[headers['Employee'] - 1]
-                    amount = row[headers['Amount'] - 1]
+                    employee_name = row[headers['Employee'] - 1] if row[headers['Employee'] - 1] else None
+                    input_type_name = row[headers['Input Type'] - 1] if row[headers['Input Type'] - 1] else None
+                    amount = row[headers['Amount'] - 1] if row[headers['Amount'] - 1] else None
                     
-                    if not employee_name or not amount:
-                        errors.append(f"Row {row_idx}: Missing employee or amount")
+                    if not employee_name or not input_type_name or amount is None:
+                        errors.append(f"Row {row_idx}: Missing employee, input type, or amount")
                         continue
                     
-                    # Find employee (exact match or search)
+                    # Find employee
                     employee = Employee.search([('name', '=', employee_name)], limit=1)
                     if not employee:
-                        # Try fuzzy search
                         employee = Employee.search([('name', 'ilike', employee_name)], limit=1)
                     
                     if not employee:
                         errors.append(f"Row {row_idx}: Employee '{employee_name}' not found")
                         continue
                     
-                    # Create input line
-                    InputLine.create({
-                        'bulk_input_id': self.bulk_input_id.id,
+                    # Find input type (by name or code)
+                    input_type = InputType.search([
+                        '|', ('name', '=', input_type_name),
+                        ('code', '=', input_type_name)
+                    ], limit=1)
+                    
+                    if not input_type:
+                        errors.append(f"Row {row_idx}: Input Type '{input_type_name}' not found")
+                        continue
+                    
+                    if not input_type.code:
+                        errors.append(f"Row {row_idx}: Input Type '{input_type_name}' has no code (must be linked to salary rule)")
+                        continue
+                    
+                    # Group by input type
+                    if input_type.id not in input_type_data:
+                        input_type_data[input_type.id] = []
+                    
+                    input_type_data[input_type.id].append({
                         'employee_id': employee.id,
-                        'amount': float(amount),
+                        'amount': float(amount)
                     })
-                    successful += 1
                     
                 except Exception as e:
                     errors.append(f"Row {row_idx}: {str(e)}")
             
+            # Create or update bulk input records for each input type
+            successful = 0
+            for input_type_id, lines in input_type_data.items():
+                input_type = InputType.browse(input_type_id)
+                
+                # Find or create bulk input record for this input type and month
+                bulk_input = BulkInput.search([
+                    ('date', '=', target_date),
+                    ('input_type_id', '=', input_type_id),
+                    ('state', 'in', ['draft', 'confirmed'])
+                ], limit=1)
+                
+                if not bulk_input:
+                    bulk_input = BulkInput.create({
+                        'name': f"{target_date.strftime('%B %Y')} - {input_type.name}",
+                        'date': target_date,
+                        'input_type_id': input_type_id,
+                        'state': 'draft'
+                    })
+                
+                # Clear existing lines for this bulk input
+                bulk_input.line_ids.unlink()
+                
+                # Create new lines
+                for line_data in lines:
+                    InputLine.create({
+                        'bulk_input_id': bulk_input.id,
+                        **line_data
+                    })
+                    successful += 1
+            
             # Show result
-            message = f"Successfully imported {successful} records."
+            message = f"Successfully imported {successful} records for {len(input_type_data)} input types."
             if errors:
-                message += f"\n\nErrors:\n" + "\n".join(errors[:10])  # Show first 10 errors
+                message += f"\n\nErrors:\n" + "\n".join(errors[:10])
                 if len(errors) > 10:
                     message += f"\n... and {len(errors) - 10} more errors."
             

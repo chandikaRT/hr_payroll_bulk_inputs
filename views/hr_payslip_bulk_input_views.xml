@@ -1,6 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Tree View -->
+    <!-- Import Wizard View -->
+    <record id="view_import_excel_wizard" model="ir.ui.view">
+        <field name="name">import.excel.wizard.form</field>
+        <field name="model">hr.payslip.input.import.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="date" 
+                               options="{'datepicker': {'format': 'MM/YYYY'}}"
+                               help="Select the target month for all imported inputs"/>
+                        <field name="excel_file" filename="filename" 
+                               widget="binary" 
+                               options="{'accepted_file_extensions': '.xlsx,.xls'}"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Excel Format (with headers):</strong>
+                        <table class="table table-sm table-bordered mt-2" style="width: auto;">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Input Type</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>Transport Deduction</td>
+                                    <td>150.00</td>
+                                </tr>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>Vehicle Allowance</td>
+                                    <td>500.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Jane Smith</td>
+                                    <td>Transport Deduction</td>
+                                    <td>200.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ul class="mt-2">
+                            <li>Input Type can be the exact name or code</li>
+                            <li>One row per employee-input type combination</li>
+                            <li>Supported formats: .xlsx, .xls</li>
+                        </ul>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Standalone Action for Import Wizard -->
+    <record id="action_import_excel_wizard_standalone" model="ir.actions.act_window">
+        <field name="name">Import Bulk Inputs</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.payslip.input.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Add Import button in tree view -->
     <record id="view_hr_payslip_bulk_input_tree" model="ir.ui.view">
         <field name="name">hr.payslip.bulk.input.tree</field>
         <field name="model">hr.payslip.bulk.input</field>
@@ -16,6 +84,7 @@
         </field>
     </record>
 
+    <!-- Keep other views from previous implementation -->
     <!-- Form View -->
     <record id="view_hr_payslip_bulk_input_form" model="ir.ui.view">
         <field name="name">hr.payslip.bulk.input.form</field>
@@ -49,16 +118,9 @@
                         </group>
                         <group>
                             <field name="total_employees"/>
-                            <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_amount" widget="monetary"/>
                         </group>
                     </group>
-                    
-                    <!-- Import Button -->
-                    <div class="oe_button_box" name="button_box">
-                        <button name="%(action_import_excel_wizard)d" type="action" 
-                                string="Import from Excel" class="oe_highlight" icon="fa-file-excel-o"
-                                states="draft"/>
-                    </div>
                     
                     <notebook>
                         <page string="Employee Lines">
@@ -79,16 +141,10 @@
                             <div class="alert alert-info" role="alert">
                                 <h4>How to Use This Module</h4>
                                 <ol>
-                                    <li>First, create a Salary Rule linked to an Input Type in Payroll → Configuration → Salary Rules</li>
-                                    <li>Then, create a Bulk Input record:
-                                        <ul>
-                                            <li>Select the month</li>
-                                            <li>Choose the Input Type (linked to your salary rule)</li>
-                                            <li>Add employee lines manually OR import from Excel</li>
-                                            <li>Confirm the record</li>
-                                        </ul>
-                                    </li>
-                                    <li>The inputs will automatically appear in employee payslips for the selected month</li>
+                                    <li>First, create Salary Rules linked to Input Types in Payroll → Configuration → Salary Rules</li>
+                                    <li>Use the <strong>Import Bulk Inputs</strong> menu to import multiple input types from Excel</li>
+                                    <li>Or create individual bulk input records for a single input type</li>
+                                    <li>Confirm records to make them appear in payslips</li>
                                 </ol>
                             </div>
                         </page>
@@ -96,48 +152,6 @@
                 </sheet>
             </form>
         </field>
-    </record>
-
-    <!-- Import Wizard View -->
-    <record id="view_import_excel_wizard" model="ir.ui.view">
-        <field name="name">import.excel.wizard.form</field>
-        <field name="model">hr.payslip.input.import.wizard</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="bulk_input_id" invisible="1"/>
-                        <field name="excel_file" filename="filename" 
-                               widget="binary" 
-                               options="{'accepted_file_extensions': '.xlsx,.xls'}"/>
-                        <field name="filename" invisible="1"/>
-                    </group>
-                    <div class="alert alert-warning" role="alert">
-                        <strong>Excel Format:</strong>
-                        <ul>
-                            <li>Column 1: Employee (exact name or partial match)</li>
-                            <li>Column 2: Amount</li>
-                            <li>Header row is required</li>
-                        </ul>
-                        <strong>Tip:</strong> Use exact employee names for best results.
-                    </div>
-                </sheet>
-                <footer>
-                    <button name="action_import" type="object" string="Import" class="oe_highlight"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
-    <!-- Action for Import Wizard -->
-    <record id="action_import_excel_wizard" model="ir.actions.act_window">
-        <field name="name">Import Excel</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">hr.payslip.input.import.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="binding_model_id" ref="model_hr_payslip_bulk_input"/>
     </record>
 
     <!-- Action for Main View -->
@@ -153,7 +167,7 @@
             <p>
                 Use this module to manage payroll inputs for multiple employees at once.
                 <br/>
-                Create input types in Payroll Configuration, then add values here.
+                For multiple input types, use the Import Bulk Inputs wizard.
             </p>
         </field>
     </record>

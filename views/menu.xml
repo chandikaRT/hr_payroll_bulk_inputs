@@ -6,6 +6,12 @@
               sequence="15"
               groups="hr_payroll.group_hr_payroll_user"/>
 
+    <menuitem id="menu_hr_bulk_import_wizard"
+              name="Import Bulk Inputs"
+              parent="menu_hr_payroll_bulk_inputs_root"
+              action="action_import_excel_wizard_standalone"
+              sequence="5"/>
+
     <menuitem id="menu_hr_payslip_bulk_input"
               name="Bulk Inputs Manager"
               parent="menu_hr_payroll_bulk_inputs_root"
