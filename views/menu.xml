@@ -1,1 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hr_payroll_bulk_inputs_root"
+              name="Bulk Inputs"
+              parent="hr_payroll.menu_hr_payroll_root"
+              sequence="15"
+              groups="hr_payroll.group_hr_payroll_user"/>
+
+    <menuitem id="menu_hr_payslip_bulk_input"
+              name="Bulk Inputs Manager"
+              parent="menu_hr_payroll_bulk_inputs_root"
+              action="action_hr_payslip_bulk_input"
+              sequence="10"/>
+</odoo>

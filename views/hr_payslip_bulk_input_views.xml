@@ -1,1 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_hr_payslip_bulk_input_tree" model="ir.ui.view">
+        <field name="name">hr.payslip.bulk.input.tree</field>
+        <field name="model">hr.payslip.bulk.input</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="input_type_id"/>
+                <field name="total_employees"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_hr_payslip_bulk_input_form" model="ir.ui.view">
+        <field name="name">hr.payslip.bulk.input.form</field>
+        <field name="model">hr.payslip.bulk.input</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,confirmed,cancelled"
+                           options="{'clickable': '1'}"/>
+                    <button name="action_confirm" type="object" string="Confirm" 
+                            class="oe_highlight" states="draft"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" 
+                            states="cancelled"/>
+                    <button name="action_cancel" type="object" string="Cancel" 
+                            states="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g., January 2025 Transport Deductions"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" widget="date" options="{'datepicker': {'format': 'MM/YYYY'}}"/>
+                            <field name="input_type_id" 
+                                   options="{'no_create': False, 'no_create_edit': False}"
+                                   domain="[('code', '!=', False)]"
+                                   context="{'form_view_ref': 'hr_payroll.hr_payslip_input_type_view_form'}"/>
+                        </group>
+                        <group>
+                            <field name="total_employees"/>
+                            <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Import Button -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_import_excel_wizard)d" type="action" 
+                                string="Import from Excel" class="oe_highlight" icon="fa-file-excel-o"
+                                states="draft"/>
+                    </div>
+                    
+                    <notebook>
+                        <page string="Employee Lines">
+                            <field name="line_ids" mode="tree,kanban">
+                                <tree editable="bottom">
+                                    <field name="employee_id" widget="many2one"/>
+                                    <field name="amount" sum="Total Amount"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="employee_id"/>
+                                        <field name="amount"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Help">
+                            <div class="alert alert-info" role="alert">
+                                <h4>How to Use This Module</h4>
+                                <ol>
+                                    <li>First, create a Salary Rule linked to an Input Type in Payroll → Configuration → Salary Rules</li>
+                                    <li>Then, create a Bulk Input record:
+                                        <ul>
+                                            <li>Select the month</li>
+                                            <li>Choose the Input Type (linked to your salary rule)</li>
+                                            <li>Add employee lines manually OR import from Excel</li>
+                                            <li>Confirm the record</li>
+                                        </ul>
+                                    </li>
+                                    <li>The inputs will automatically appear in employee payslips for the selected month</li>
+                                </ol>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Import Wizard View -->
+    <record id="view_import_excel_wizard" model="ir.ui.view">
+        <field name="name">import.excel.wizard.form</field>
+        <field name="model">hr.payslip.input.import.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="bulk_input_id" invisible="1"/>
+                        <field name="excel_file" filename="filename" 
+                               widget="binary" 
+                               options="{'accepted_file_extensions': '.xlsx,.xls'}"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Excel Format:</strong>
+                        <ul>
+                            <li>Column 1: Employee (exact name or partial match)</li>
+                            <li>Column 2: Amount</li>
+                            <li>Header row is required</li>
+                        </ul>
+                        <strong>Tip:</strong> Use exact employee names for best results.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_import" type="object" string="Import" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Import Wizard -->
+    <record id="action_import_excel_wizard" model="ir.actions.act_window">
+        <field name="name">Import Excel</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.payslip.input.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_hr_payslip_bulk_input"/>
+    </record>
+
+    <!-- Action for Main View -->
+    <record id="action_hr_payslip_bulk_input" model="ir.actions.act_window">
+        <field name="name">Bulk Payslip Inputs</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.payslip.bulk.input</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first bulk input entry
+            </p>
+            <p>
+                Use this module to manage payroll inputs for multiple employees at once.
+                <br/>
+                Create input types in Payroll Configuration, then add values here.
+            </p>
+        </field>
+    </record>
+</odoo>
