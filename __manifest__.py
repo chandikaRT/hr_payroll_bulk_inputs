@@ -12,7 +12,7 @@
         - Link with Odoo standard hr.payslip.input.type
     """,
     'depends': [
-        'hr'
+        'hr',
         'hr_payroll',
     ],
     'data': [
