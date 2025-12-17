@@ -93,14 +93,24 @@
             <form>
                 <header>
                     <field name="state" widget="statusbar" 
-                           statusbar_visible="draft,confirmed,cancelled"
-                           options="{'clickable': '1'}"/>
-                    <button name="action_confirm" type="object" string="Confirm" 
-                            class="oe_highlight" states="draft"/>
-                    <button name="action_draft" type="object" string="Reset to Draft" 
-                            states="cancelled"/>
-                    <button name="action_cancel" type="object" string="Cancel" 
-                            states="draft,confirmed"/>
+                        statusbar_visible="draft,confirmed,cancelled"
+                        options="{'clickable': '1'}"/>
+
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirm"
+                            class="oe_highlight"
+                            modifiers="{'invisible': [['state', '!=', 'draft']]}"/>
+
+                    <button name="action_draft"
+                            type="object"
+                            string="Reset to Draft"
+                            modifiers="{'invisible': [['state', '!=', 'cancelled']]}"/>
+
+                    <button name="action_cancel"
+                            type="object"
+                            string="Cancel"
+                            modifiers="{'invisible': [['state', 'not in', ['draft','confirmed']]]}"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
