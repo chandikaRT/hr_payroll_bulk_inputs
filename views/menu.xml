@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Root menu: clickable in top navbar -->
+
+    <!-- Root menu under Payroll -->
     <menuitem id="menu_hr_payroll_bulk_inputs_root"
               name="Bulk Inputs"
-              parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"
+              parent="hr_payroll.menu_hr_payroll_root"
               sequence="15"
-              groups="hr_payroll.group_hr_payroll_user"
-              action="action_hr_payslip_bulk_input"/>
+              groups="hr_payroll.group_hr_payroll_user"/>
 
-    <!-- Import Wizard submenu -->
+    <!-- Import Wizard -->
     <menuitem id="menu_hr_bulk_import_wizard"
               name="Import Bulk Inputs"
               parent="menu_hr_payroll_bulk_inputs_root"
               action="action_import_excel_wizard_standalone"
-              sequence="5"
-              groups="hr_payroll.group_hr_payroll_user"/>
+              sequence="5"/>
 
-    <!-- Bulk Input Manager submenu -->
+    <!-- Bulk Input Manager -->
     <menuitem id="menu_hr_payslip_bulk_input"
               name="Bulk Inputs Manager"
               parent="menu_hr_payroll_bulk_inputs_root"
               action="action_hr_payslip_bulk_input"
-              sequence="10"
-              groups="hr_payroll.group_hr_payroll_user"/>
+              sequence="10"/>
+
 </odoo>
