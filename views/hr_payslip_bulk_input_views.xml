@@ -59,7 +59,7 @@
         </field>
     </record>
 
-    <!-- Standalone Action for Import Wizard -->
+    <!-- Action for Import Wizard -->
     <record id="action_import_excel_wizard_standalone" model="ir.actions.act_window">
         <field name="name">Import Bulk Inputs</field>
         <field name="type">ir.actions.act_window</field>
@@ -68,7 +68,7 @@
         <field name="target">new</field>
     </record>
 
-    <!-- Add Import button in tree view -->
+    <!-- Tree View for Bulk Input -->
     <record id="view_hr_payslip_bulk_input_tree" model="ir.ui.view">
         <field name="name">hr.payslip.bulk.input.tree</field>
         <field name="model">hr.payslip.bulk.input</field>
@@ -84,8 +84,7 @@
         </field>
     </record>
 
-    <!-- Keep other views from previous implementation -->
-    <!-- Form View -->
+    <!-- Form View for Bulk Input -->
     <record id="view_hr_payslip_bulk_input_form" model="ir.ui.view">
         <field name="name">hr.payslip.bulk.input.form</field>
         <field name="model">hr.payslip.bulk.input</field>
@@ -181,14 +180,5 @@
                 For multiple input types, use the Import Bulk Inputs wizard.
             </p>
         </field>
-    </record>
-
-    <!-- Action for Import Wizard -->
-    <record id="action_import_excel_wizard_standalone" model="ir.actions.act_window">
-        <field name="name">Import Bulk Inputs</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">hr.payslip.input.import.wizard</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
     </record>
 </odoo>
