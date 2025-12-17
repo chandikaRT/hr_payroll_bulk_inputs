@@ -6,7 +6,8 @@
               name="Bulk Inputs"
               parent="hr_work_entry_contract_enterprise.menu_hr_payroll_root"
               sequence="15"
-              groups="hr_payroll.group_hr_payroll_user"/>
+              groups="hr_payroll.group_hr_payroll_user"
+              action="action_hr_payslip_bulk_input"/>
 
     <!-- Import Wizard -->
     <menuitem id="menu_hr_bulk_import_wizard"
