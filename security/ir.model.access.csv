@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_payslip_bulk_input_user,hr.payslip.bulk.input.user,model_hr_payslip_bulk_input,group_hr_bulk_input_user,1,1,1,0
+access_hr_payslip_bulk_input_manager,hr.payslip.bulk.input.manager,model_hr_payslip_bulk_input,group_hr_bulk_input_manager,1,1,1,1
+access_hr_payslip_input_line_user,hr.payslip.input.line.user,model_hr_payslip_input_line,group_hr_bulk_input_user,1,1,1,0
+access_hr_payslip_input_line_manager,hr.payslip.input.line.manager,model_hr_payslip_input_line,group_hr_bulk_input_manager,1,1,1,1
+access_import_excel_wizard,import.excel.wizard,model_hr_payslip_input_import_wizard,group_hr_bulk_input_user,1,1,1,0
