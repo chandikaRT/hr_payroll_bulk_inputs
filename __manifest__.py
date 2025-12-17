@@ -19,7 +19,6 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/hr_payslip_bulk_input_views.xml',
-        'views/menu.xml',
     ],
     'installable': True,
     'application': False,
