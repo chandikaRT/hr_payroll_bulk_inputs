@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Root menu under Payroll Configuration -->
+    <!-- Root menu under HR Root Menu -->
     <menuitem id="menu_hr_payroll_bulk_inputs_root"
               name="Bulk Inputs"
-              parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
+              parent="hr.menu_hr_root"
               sequence="10"
               groups="hr_payroll.group_hr_payroll_user"/>
 
