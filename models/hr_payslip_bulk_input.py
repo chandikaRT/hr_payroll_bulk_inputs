@@ -15,7 +15,7 @@ class HrPayslipBulkInput(models.Model):
     date = fields.Date(
         string='Effective Month',
         required=True,
-        default=fields.Date.today(),
+        default=fields.Date.today,
         help="Select the month/year for these inputs"
     )
     input_type_id = fields.Many2one(
@@ -42,6 +42,13 @@ class HrPayslipBulkInput(models.Model):
     total_amount = fields.Float(
         string='Total Amount',
         compute='_compute_totals',
+        store=True
+    )
+    # Add currency for display
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        default=lambda self: self.env.company.currency_id,
         store=True
     )
 
