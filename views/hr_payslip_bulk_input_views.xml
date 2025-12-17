@@ -191,22 +191,4 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-
-    <!-- Action for Bulk Input Manager -->
-    <record id="action_hr_payslip_bulk_input" model="ir.actions.act_window">
-        <field name="name">Bulk Inputs Manager</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">hr.payslip.bulk.input</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first bulk input entry
-            </p>
-            <p>
-                Use this module to manage payroll inputs for multiple employees at once.
-                <br/>
-                For multiple input types, use the Import Bulk Inputs wizard.
-            </p>
-        </field>
-    </record>
 </odoo>

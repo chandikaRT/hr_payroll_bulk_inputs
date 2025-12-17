@@ -5,7 +5,7 @@
     <menuitem id="menu_hr_payroll_bulk_inputs_root"
               name="Bulk Inputs"
               parent="hr_work_entry_contract_enterprise.menu_hr_payroll_configuration"
-              sequence="15"
+              sequence="10"
               groups="hr_payroll.group_hr_payroll_user"/>
 
     <!-- Import Wizard -->
